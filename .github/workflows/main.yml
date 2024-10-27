@@ -1,0 +1,37 @@
+name: Build APK
+
+on:
+  push:
+    branches:
+      - main  # Se ejecuta en cada push a la rama principal
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'  # Versión de Python
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-pip python3-setuptools python3-wheel python3-dev
+        pip install --upgrade pip
+        pip install kivy buildozer
+
+    - name: Build APK
+      run: |
+        cd $GITHUB_WORKSPACE  # Cambia a la carpeta de trabajo del repositorio
+        buildozer -v android debug  # Comando para construir el APK
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: HolaMundo.apk
+        path: bin/HolaMundo-*.apk
